@@ -2,6 +2,7 @@ import os
 from typing import Dict, List, Optional, Tuple
 
 import requests
+from requests.auth import HTTPBasicAuth
 
 
 ZONE_COORDINATES: Dict[str, Tuple[float, float]] = {
@@ -34,25 +35,36 @@ class WattTimeClient:
     PASSWORD_URL = "https://api.watttime.org/v2/password"
     BA_LOOKUP_URL = "https://api.watttime.org/v2/ba"
     BA_LATEST_URL = "https://api.watttime.org/v2/ba/{ba_id}/latest"
+    WATTTIME_API_URL = 'https://api.watttime.org/'
 
-    def __init__(self, api_key: Optional[str] = None, username: Optional[str] = None, password: Optional[str] = None):
-        self.api_key = api_key
+    def __init__(self, user_email: Optional[str] = None, username: Optional[str] = None, password: Optional[str] = None, org: Optional[str] = None):
+        self.user_email = user_email
         self.username = username
         self.password = password
+        self.org = org
         self.session = requests.Session()
         self.token: Optional[str] = None
 
         if self.api_key:
             self.token = self.api_key
         elif self.username and self.password:
-            self.token = self.authenticate(self.username, self.password)
+            self.token = self.authenticate(self.username, self.password, self.user_email, self.org)
 
-    def authenticate(self, username: str, password: str) -> str:
-        auth = (username, password)
-        response = self.session.get(self.PASSWORD_URL, auth=auth, timeout=10)
-        response.raise_for_status()
-        payload = response.json()
-        token = payload.get("token") or payload.get("access_token")
+    def authenticate(self, username: str, password: str, email: str, org: str) -> str:
+        register_rl = os.path.join(self.WATTTIME_API_URL, "register")
+        login_url = os.path.join(self.WATTTIME_API_URL, "login")
+
+        params = {'username': username,
+                'password': password,
+                'email': email,
+                'org': org
+                }
+        register_response = self.session.post(register_rl, json=params, timeout=120)
+  
+        # rsp = requests.post(register_url, json=params)
+        register_response.raise_for_status()
+        rsp = requests.get(login_url, auth=HTTPBasicAuth(username, org))
+        token = rsp.json()['token']
         if not token:
             raise RuntimeError("WattTime authentication response did not include a token.")
         return str(token)
@@ -93,9 +105,9 @@ class CarbonIntensityMonitor:
         self.history = {zone: [] for zone in self.zones}
         self.electricitymaps_client = ElectricityMapsClient(os.getenv("ELECTRICITYMAPS_API_KEY"))
         self.watttime_client = WattTimeClient(
-            api_key=os.getenv("WATTTIME_API_KEY"),
             username=os.getenv("WATTTIME_USERNAME"),
             password=os.getenv("WATTTIME_PASSWORD"),
+            user_email=os.getenv("WATTTIME_USER_EMAIL")
         )
 
     def _synthesize_intensity(self, zone: str, base: float) -> float:
