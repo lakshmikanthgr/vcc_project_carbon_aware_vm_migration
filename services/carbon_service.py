@@ -31,18 +31,40 @@ class ElectricityMapsClient:
 
 
 class WattTimeClient:
+    PASSWORD_URL = "https://api.watttime.org/v2/password"
     BA_LOOKUP_URL = "https://api.watttime.org/v2/ba"
     BA_LATEST_URL = "https://api.watttime.org/v2/ba/{ba_id}/latest"
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: Optional[str] = None, username: Optional[str] = None, password: Optional[str] = None):
         self.api_key = api_key
-        self.session = requests.Session() if api_key else None
+        self.username = username
+        self.password = password
+        self.session = requests.Session()
+        self.token: Optional[str] = None
+
+        if self.api_key:
+            self.token = self.api_key
+        elif self.username and self.password:
+            self.token = self.authenticate(self.username, self.password)
+
+    def authenticate(self, username: str, password: str) -> str:
+        auth = (username, password)
+        response = self.session.get(self.PASSWORD_URL, auth=auth, timeout=10)
+        response.raise_for_status()
+        payload = response.json()
+        token = payload.get("token") or payload.get("access_token")
+        if not token:
+            raise RuntimeError("WattTime authentication response did not include a token.")
+        return str(token)
+
+    def _ensure_token(self) -> str:
+        if not self.token:
+            raise RuntimeError("WattTime API token is not configured. Set WATTTIME_API_KEY or WATTTIME_USERNAME/WATTTIME_PASSWORD.")
+        return self.token
 
     def get_ba_id(self, coordinates: Tuple[float, float]) -> Optional[str]:
-        if not self.api_key:
-            raise RuntimeError("WattTime API key is not configured.")
-
-        headers = {"Authorization": f"Bearer {self.api_key}"}
+        token = self._ensure_token()
+        headers = {"Authorization": f"Bearer {token}"}
         params = {"latitude": coordinates[0], "longitude": coordinates[1]}
         response = self.session.get(self.BA_LOOKUP_URL, headers=headers, params=params, timeout=10)
         response.raise_for_status()
@@ -55,7 +77,8 @@ class WattTimeClient:
         if not ba_id:
             raise RuntimeError(f"Unable to resolve WattTime BA for zone {zone}.")
 
-        headers = {"Authorization": f"Bearer {self.api_key}"}
+        token = self._ensure_token()
+        headers = {"Authorization": f"Bearer {token}"}
         url = self.BA_LATEST_URL.format(ba_id=ba_id)
         response = self.session.get(url, headers=headers, timeout=10)
         response.raise_for_status()
@@ -69,7 +92,11 @@ class CarbonIntensityMonitor:
         self.latest = {zone: 0.0 for zone in self.zones}
         self.history = {zone: [] for zone in self.zones}
         self.electricitymaps_client = ElectricityMapsClient(os.getenv("ELECTRICITYMAPS_API_KEY"))
-        self.watttime_client = WattTimeClient(os.getenv("WATTTIME_API_KEY"))
+        self.watttime_client = WattTimeClient(
+            api_key=os.getenv("WATTTIME_API_KEY"),
+            username=os.getenv("WATTTIME_USERNAME"),
+            password=os.getenv("WATTTIME_PASSWORD"),
+        )
 
     def _synthesize_intensity(self, zone: str, base: float) -> float:
         return max(0.0, base + (hash(zone) % 40 - 20))

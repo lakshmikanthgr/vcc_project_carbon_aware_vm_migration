@@ -35,8 +35,9 @@ Set the following environment variables to enable real API polling:
 
 - `ELECTRICITYMAPS_API_KEY`
 - `WATTTIME_API_KEY`
+- or `WATTTIME_USERNAME` and `WATTTIME_PASSWORD`
 
-If either API key is not configured, the monitor falls back to synthetic intensity values so the framework remains runnable.
+If `WATTTIME_API_KEY` is not configured, the monitor will attempt WattTime authentication using `WATTTIME_USERNAME`/`WATTTIME_PASSWORD`. If neither WattTime credential path is configured, the monitor falls back to synthetic intensity values so the framework remains runnable.
 
 ## Getting Started
 

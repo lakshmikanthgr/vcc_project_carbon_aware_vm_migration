@@ -1,13 +1,25 @@
 [project]
 name = "vcc-project-carbon-aware-vm-migration"
 version = "0.1.0"
-description = "Add your description here"
+description = "Carbon-aware live VM migration framework with SLA guarantees."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "loguru>=0.7.3",
-    "pytest>=9.0.2",
     "requests>=2.31.0",
     "numpy>=1.26.0",
     "torch>=2.0.0",
+    "watttime>=1.3.2",
 ]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.2",
+    "black>=24.1.0",
+    "ruff>=0.0.0",
+]
+
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
