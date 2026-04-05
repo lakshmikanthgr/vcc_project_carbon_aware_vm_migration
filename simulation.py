@@ -101,6 +101,15 @@ def simulate_sla_blocked_path(engine: DecisionEngine) -> None:
     print_decision(decision)
 
 
+def simulate_happy_sad_and_sla_blocked_paths() -> None:
+    engine = DecisionEngine(MigrationCostEstimator(network_capacity_mbps=1000.0), SlaTierClassifier())
+    simulate_happy_path(engine)
+    print()
+    simulate_sad_path(engine)
+    print()
+    simulate_sla_blocked_path(engine)
+
+
 def simulate_real_case() -> None:
     orchestrator = Orchestrator()
     vm_inventory: List[Dict[str, Any]] = [
