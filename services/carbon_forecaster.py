@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 
 import numpy as np
 import torch
@@ -96,7 +96,20 @@ class CarbonForecaster:
 
         self.trained = True
 
-    def forecast(self, history: List[float]) -> Dict[int, float]:
+    def forecast(self, history: List[float], watttime_forecast: Optional[List[Dict[str, Any]]] = None) -> Dict[int, float]:
+        # If WattTime forecast data is available, use it as primary source
+        if watttime_forecast and len(watttime_forecast) > 0:
+            forecast_dict = {}
+            for i, point in enumerate(watttime_forecast[:self.horizon_hours]):
+                # Extract value from forecast data (assuming format: {"point_time": "...", "value": float})
+                value = point.get("value", 0.0)
+                forecast_dict[i + 1] = max(0.0, float(value))
+            # Fill remaining hours if forecast is shorter than horizon
+            for hour in range(len(forecast_dict) + 1, self.horizon_hours + 1):
+                forecast_dict[hour] = forecast_dict.get(len(forecast_dict), history[-1] if history else 0.0)
+            return forecast_dict
+
+        # Fall back to TCN or trend-based forecasting
         if len(history) < self.seq_len:
             return {hour: history[-1] if history else 0.0 for hour in range(1, self.horizon_hours + 1)}
 

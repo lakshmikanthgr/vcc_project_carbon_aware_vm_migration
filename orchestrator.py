@@ -23,9 +23,11 @@ class Orchestrator:
 
         for zone in self.monitor.zones:
             history = self.monitor.get_history(zone)
+            # Try to get WattTime forecast data
+            watttime_forecast = self.monitor.get_forecast(zone, horizon_hours=self.forecaster.horizon_hours)
             if len(history) >= self.forecaster.seq_len + self.forecaster.horizon_hours:
                 self.forecaster.train(history, epochs=10)
-            forecasted_intensities[zone] = self.forecaster.forecast(history)
+            forecasted_intensities[zone] = self.forecaster.forecast(history, watttime_forecast)
 
         outcomes: List[Dict[str, Any]] = []
         for vm in vm_inventory:
