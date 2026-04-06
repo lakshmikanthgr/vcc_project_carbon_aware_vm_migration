@@ -48,8 +48,8 @@ class ElectricityMapsClient:
 
 class WattTimeClient:
     DEFAULT_BASE_URL = "https://api.watttime.org"
-    REGION_FROM_LOC_PATH = "/v3/region-from-loc"
-    FORECAST_PATH = "/v3/forecast"
+    REGION_FROM_LOC_PATH = "/region-from-loc"
+    FORECAST_PATH = "/forecast"
 
     def __init__(self, username: Optional[str] = None, password: Optional[str] = None, user_email: Optional[str] = None, org: Optional[str] = None, timeout: int = 10):
         self.username = username
@@ -106,22 +106,24 @@ class WattTimeClient:
         token = self._ensure_token()
         headers = {"Authorization": f"Bearer {token}"}
         params = {
-            "signal_type": signal_type,
             "latitude": coordinates[0],
-            "longitude": coordinates[1]
+            "longitude": coordinates[1],
+            "signal_type": signal_type,
+
         }
         response = self.session.get(self.REGION_FROM_LOC_URL, headers=headers, params=params, timeout=self.timeout)
-        print(f"[DEBUG] Region request: {self.REGION_FROM_LOC_URL} coords={coordinates} status={response.status_code}")
+        #print(f"[DEBUG] Region request: {self.REGION_FROM_LOC_URL} coords={coordinates} status={response.status_code}")
         response.raise_for_status()
         payload = response.json()
         region = payload.get("region")
-        print(f"[DEBUG] Got region: {region} from payload: {payload}")
+        #print(f"[DEBUG] Got region: {region} from payload: {payload}")
         if region:
             self._region_cache[coordinates] = (region, time.time())
         return region
 
     def get_forecast(self, coordinates: Tuple[float, float], signal_type: str = "co2_moer", horizon_hours: int = 24) -> List[Dict[str, any]]:
         region = self.get_region(coordinates, signal_type)
+        print(f"self._region_cache: {self._region_cache}")
         if not region:
             raise RuntimeError(f"Unable to resolve WattTime region for coordinates {coordinates}.")
 
@@ -130,7 +132,7 @@ class WattTimeClient:
         params = {
             "region": region,
             "signal_type": signal_type,
-            "horizon_hours": min(horizon_hours, 72)  # Max 72 hours
+    
         }
         response = self.session.get(self.FORECAST_URL, headers=headers, params=params, timeout=self.timeout)
         print(f"[DEBUG] Forecast request: {self.FORECAST_URL} region={region} status={response.status_code} content-type={response.headers.get('content-type')} response_len={len(response.text)}")
