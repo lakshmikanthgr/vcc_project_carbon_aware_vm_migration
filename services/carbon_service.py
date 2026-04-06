@@ -49,7 +49,7 @@ class ElectricityMapsClient:
 class WattTimeClient:
     DEFAULT_BASE_URL = "https://api.watttime.org"
     REGION_FROM_LOC_PATH = "/region-from-loc"
-    FORECAST_PATH = "/forecast"
+    SIGNAL_INDEX_PATH = "/signal-index"
 
     def __init__(self, username: Optional[str] = None, password: Optional[str] = None, user_email: Optional[str] = None, org: Optional[str] = None, timeout: int = 10):
         self.username = username
@@ -66,7 +66,7 @@ class WattTimeClient:
         self.REGISTER_URL = f"{self.base_url}/register"
         self.LOGIN_URL = f"{self.DEFAULT_BASE_URL}/login"
         self.REGION_FROM_LOC_URL = f"{self.base_url}{self.REGION_FROM_LOC_PATH}"
-        self.FORECAST_URL = f"{self.base_url}{self.FORECAST_PATH}"
+        self.SIGNAL_INDEX_URL = f"{self.base_url}{self.SIGNAL_INDEX_PATH}"
         if self.username and self.password and self.user_email and self.org:
             self.token = self.authenticate()
 
@@ -79,7 +79,7 @@ class WattTimeClient:
             'org': self.org
         }
         register_response = self.session.post(self.REGISTER_URL, json=register_params, timeout=self.timeout)
-        print(f"WattTime registration response: {register_response.status_code} - {register_response.text}")
+        #print(f"WattTime registration response: {register_response.status_code} - {register_response.text}")
         if register_response.status_code not in [200, 201, 409]:  # 409 means already registered
             register_response.raise_for_status()
 
@@ -121,9 +121,12 @@ class WattTimeClient:
             self._region_cache[coordinates] = (region, time.time())
         return region
 
-    def get_forecast(self, coordinates: Tuple[float, float], signal_type: str = "co2_moer", horizon_hours: int = 24) -> List[Dict[str, any]]:
+    def get_signal_index(self, coordinates: Tuple[float, float], signal_type: str = "co2_moer") -> Optional[float]:
+        """
+        Get current carbon signal index from WattTime signal-index endpoint.
+        Returns the raw value directly without needing to parse forecast arrays.
+        """
         region = self.get_region(coordinates, signal_type)
-        print(f"self._region_cache: {self._region_cache}")
         if not region:
             raise RuntimeError(f"Unable to resolve WattTime region for coordinates {coordinates}.")
 
@@ -132,33 +135,32 @@ class WattTimeClient:
         params = {
             "region": region,
             "signal_type": signal_type,
-    
         }
-        response = self.session.get(self.FORECAST_URL, headers=headers, params=params, timeout=self.timeout)
-        print(f"[DEBUG] Forecast request: {self.FORECAST_URL} region={region} status={response.status_code} content-type={response.headers.get('content-type')} response_len={len(response.text)}")
-        if response.status_code != 200:
-            print(f"[DEBUG] Response text: {response.text[:500]}")
+        response = self.session.get(self.SIGNAL_INDEX_URL, headers=headers, params=params, timeout=self.timeout)
+        print(f"[DEBUG] Signal-index request: {self.SIGNAL_INDEX_URL} region={region} status={response.status_code}")
         response.raise_for_status()
         payload = response.json()
-        return payload.get("data", [])
+        # Signal-index returns data as a list with one point
+        data = payload.get("data", [])
+        if data and isinstance(data, list) and len(data) > 0:
+            return float(data[0].get("value", 0.0))
+        return None
 
     def get_intensity(self, zone: str, coordinates: Tuple[float, float]) -> float:
         """
-        Get current carbon intensity using forecast data (WattTime v3 documented API).
-        Extracts the first forecast point which represents current/near-term intensity.
+        Get current carbon intensity from WattTime signal-index endpoint.
+        Returns the current CO2 MOER value directly.
         """
         try:
-            forecast_data = self.get_forecast(coordinates)
-            if forecast_data and len(forecast_data) > 0:
-                first_point = forecast_data[0]
-                value = float(first_point.get("value", 0.0))
-                return max(0.0, value)
-        except Exception:
-            pass
+            value = self.get_signal_index(coordinates)
+            if value is not None:
+                return max(0.0, float(value))
+        except Exception as e:
+            print(f"[DEBUG] WattTime signal-index error for {zone}: {e}")
         
         raise RuntimeError(
             f"Unable to fetch WattTime carbon intensity for zone {zone}. "
-            "Ensure region is valid and forecast data is available."
+            "Ensure region is valid and signal data is available."
         )
 
 
@@ -225,14 +227,8 @@ class CarbonIntensityMonitor:
         return zone_intensities
 
     def get_forecast(self, zone: str, horizon_hours: int = 24) -> List[Dict[str, any]]:
-        coordinates = ZONE_COORDINATES.get(zone, (0.0, 0.0))
-        try:
-            forecast_data = self.watttime_client.get_forecast(coordinates, horizon_hours=horizon_hours)
-            return forecast_data
-        except Exception as e:
-            print(f"WattTime forecast API error for {zone}: {e}")
-            # Return empty forecast as fallback
-            return []
+        # Signal-index provides current intensity only; return empty as no forecast data available
+        return []
 
     def get_latest_intensity(self, zone: str) -> float:
         return self.latest.get(zone, 0.0)
