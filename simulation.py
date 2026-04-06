@@ -22,18 +22,19 @@ def print_decision(decision: Any) -> None:
 def simulate_happy_path(engine: DecisionEngine) -> None:
     happy_vm = {
         "id": "vm-happy",
-        "current_zone": "us-east",
+        "current_zone": "DK-DK1",
         "size_gb": 8.0,
         "steady_power_kw": 1.0,
         "forecast_horizon_hours": 4.0,
         "sla_contract": {"latency_ms": 40, "critical": False},
         "runtime_metrics": {"cpu_utilization": 45.0, "dirty_rate": 8.0, "headroom": 60.0},
     }
-    happy_current_intensities = {"us-east": 320.0, "us-west": 260.0, "eu-central": 110.0}
+    happy_current_intensities = {"DK-DK1": 320.0, "SE": 80.0, "DE": 200.0, "US-AK": 150.0}
     happy_forecasts = {
-        "us-east": {1: 320.0, 2: 315.0, 3: 310.0, 4: 305.0},
-        "us-west": {1: 260.0, 2: 255.0, 3: 250.0, 4: 245.0},
-        "eu-central": {1: 110.0, 2: 108.0, 3: 106.0, 4: 104.0},
+        "DK-DK1": {1: 320.0, 2: 315.0, 3: 310.0, 4: 305.0},
+        "SE": {1: 80.0, 2: 78.0, 3: 76.0, 4: 74.0},
+        "DE": {1: 200.0, 2: 198.0, 3: 196.0, 4: 194.0},
+        "US-AK": {1: 150.0, 2: 148.0, 3: 146.0, 4: 144.0},
     }
 
     print("=== Happy Path Scenario ===")
@@ -50,18 +51,19 @@ def simulate_happy_path(engine: DecisionEngine) -> None:
 def simulate_sad_path(engine: DecisionEngine) -> None:
     sad_vm = {
         "id": "vm-sad",
-        "current_zone": "us-east",
+        "current_zone": "DK-DK1",
         "size_gb": 16.0,
         "steady_power_kw": 1.2,
         "forecast_horizon_hours": 3.0,
         "sla_contract": {"latency_ms": 15, "critical": True},
         "runtime_metrics": {"cpu_utilization": 88.0, "dirty_rate": 120.0, "headroom": 15.0},
     }
-    sad_current_intensities = {"us-east": 280.0, "us-west": 250.0, "eu-central": 240.0}
+    sad_current_intensities = {"DK-DK1": 280.0, "SE": 90.0, "DE": 210.0, "US-AK": 160.0}
     sad_forecasts = {
-        "us-east": {1: 280.0, 2: 282.0, 3: 285.0, 4: 288.0},
-        "us-west": {1: 250.0, 2: 252.0, 3: 254.0, 4: 256.0},
-        "eu-central": {1: 240.0, 2: 242.0, 3: 245.0, 4: 248.0},
+        "DK-DK1": {1: 280.0, 2: 282.0, 3: 285.0, 4: 288.0},
+        "SE": {1: 90.0, 2: 92.0, 3: 94.0, 4: 96.0},
+        "DE": {1: 210.0, 2: 212.0, 3: 215.0, 4: 218.0},
+        "US-AK": {1: 160.0, 2: 162.0, 3: 165.0, 4: 168.0},
     }
 
     print("=== Sad Path Scenario ===")
@@ -78,18 +80,19 @@ def simulate_sad_path(engine: DecisionEngine) -> None:
 def simulate_sla_blocked_path(engine: DecisionEngine) -> None:
     sla_blocked_vm = {
         "id": "vm-sla-blocked",
-        "current_zone": "us-east",
+        "current_zone": "DK-DK1",
         "size_gb": 64.0,
         "steady_power_kw": 1.5,
         "forecast_horizon_hours": 4.0,
         "sla_contract": {"latency_ms": 15, "critical": True},
         "runtime_metrics": {"cpu_utilization": 90.0, "dirty_rate": 95.0, "headroom": 10.0},
     }
-    sla_blocked_intensities = {"us-east": 320.0, "us-west": 180.0, "eu-central": 170.0}
+    sla_blocked_intensities = {"DK-DK1": 320.0, "SE": 100.0, "DE": 180.0, "US-AK": 140.0}
     sla_blocked_forecasts = {
-        "us-east": {1: 320.0, 2: 318.0, 3: 315.0, 4: 312.0},
-        "us-west": {1: 180.0, 2: 178.0, 3: 176.0, 4: 175.0},
-        "eu-central": {1: 170.0, 2: 168.0, 3: 166.0, 4: 165.0},
+        "DK-DK1": {1: 320.0, 2: 318.0, 3: 315.0, 4: 312.0},
+        "SE": {1: 100.0, 2: 98.0, 3: 96.0, 4: 94.0},
+        "DE": {1: 180.0, 2: 178.0, 3: 176.0, 4: 174.0},
+        "US-AK": {1: 140.0, 2: 138.0, 3: 136.0, 4: 134.0},
     }
 
     print("=== SLA-Blocked Scenario ===")
@@ -117,7 +120,7 @@ def simulate_real_case() -> None:
     vm_inventory: List[Dict[str, Any]] = [
         {
             "id": "vm-real-01",
-            "current_zone": "us-east",
+            "current_zone": "DK-DK1",
             "size_gb": 24.0,
             "steady_power_kw": 1.2,
             "forecast_horizon_hours": 3.0,
@@ -126,7 +129,7 @@ def simulate_real_case() -> None:
         },
         {
             "id": "vm-real-02",
-            "current_zone": "eu-central",
+            "current_zone": "DE",
             "size_gb": 48.0,
             "steady_power_kw": 1.6,
             "forecast_horizon_hours": 4.0,

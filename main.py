@@ -11,7 +11,7 @@ def main() -> None:
     sample_vms = [
         {
             "id": "vm-1",
-            "current_zone": "us-east",
+            "current_zone": "DK-DK1",
             "size_gb": 32.0,
             "steady_power_kw": 1.25,
             "forecast_horizon_hours": 3.0,
@@ -20,7 +20,7 @@ def main() -> None:
         },
         {
             "id": "vm-2",
-            "current_zone": "eu-central",
+            "current_zone": "DE",
             "size_gb": 16.0,
             "steady_power_kw": 0.9,
             "forecast_horizon_hours": 4.0,
@@ -29,7 +29,7 @@ def main() -> None:
         },
         {
             "id": "vm-3",
-            "current_zone": "us-west",
+            "current_zone": "SE",
             "size_gb": 8.0,
             "steady_power_kw": 0.7,
             "forecast_horizon_hours": 2.0,

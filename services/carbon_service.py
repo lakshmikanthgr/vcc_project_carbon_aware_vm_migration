@@ -2,14 +2,18 @@ import os
 import time
 from typing import Dict, List, Optional, Tuple
 
+from dotenv import load_dotenv
 import requests
 from requests.auth import HTTPBasicAuth
 
+load_dotenv()
+
 
 ZONE_COORDINATES: Dict[str, Tuple[float, float]] = {
-    "us-east": (38.9072, -77.0369),
-    "us-west": (37.7749, -122.4194),
-    "eu-central": (50.1109, 8.6821),
+    "DK-DK1": (56.0, 8.5),
+    "DE": (51.1657, 10.4515),
+    "SE": (60.1282, 18.6435),
+    "US-AK": (64.2008, -152.2782),
 }
 
 
@@ -163,7 +167,7 @@ class WattTimeClient:
 
 class CarbonIntensityMonitor:
     def __init__(self, zones: Optional[List[str]] = None, poll_interval: int = 300):
-        self.zones = zones or ["us-east", "us-west", "eu-central"]
+        self.zones = zones or ["DK-DK1", "DE", "SE", "US-AK"]
         self.poll_interval = poll_interval  # seconds between polls
         self.latest = {zone: 0.0 for zone in self.zones}
         self.history = {zone: [] for zone in self.zones}
@@ -173,7 +177,7 @@ class CarbonIntensityMonitor:
             username=os.getenv("WATTTIME_USERNAME"),
             password=os.getenv("WATTTIME_PASSWORD"),
             user_email=os.getenv("WATTTIME_USER_EMAIL"),
-            org=os.getenv("WATTTIME_ORG")
+            org=os.getenv("WATTTIME_ORG") or os.getenv("ORG")
         )
 
     def _synthesize_intensity(self, zone: str, base: float) -> float:
