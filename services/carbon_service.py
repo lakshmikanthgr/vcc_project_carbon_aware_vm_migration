@@ -47,12 +47,9 @@ class ElectricityMapsClient:
 
 
 class WattTimeClient:
-    REGISTER_URL = "https://api.watttime.org/register"
-    LOGIN_URL = "https://api.watttime.org/login"
-    REGION_FROM_LOC_URL = "https://api.watttime.org/v3/region-from-loc"
-    FORECAST_URL = "https://api.watttime.org/v3/forecast"
-    BA_LOOKUP_URL = "https://api.watttime.org/v2/ba"  # Keep v2 for backward compatibility
-    BA_LATEST_URL = "https://api.watttime.org/v2/ba/{ba_id}/latest"  # Keep v2 for backward compatibility
+    DEFAULT_BASE_URL = "https://api.watttime.org"
+    REGION_FROM_LOC_PATH = "/v3/region-from-loc"
+    FORECAST_PATH = "/v3/forecast"
 
     def __init__(self, username: Optional[str] = None, password: Optional[str] = None, user_email: Optional[str] = None, org: Optional[str] = None, timeout: int = 10):
         self.username = username
@@ -62,9 +59,14 @@ class WattTimeClient:
         self.timeout = timeout
         self.session = requests.Session()
         self.token: Optional[str] = None
-        self._cache: Dict[Tuple[float, float], Tuple[str, float]] = {}  # coordinates -> (ba_id, timestamp)
         self._region_cache: Dict[Tuple[float, float], Tuple[str, float]] = {}  # coordinates -> (region, timestamp)
 
+        base_url = os.getenv("WATTTIME_USING_API_URL") or os.getenv("WATTTIME_API_URL") or self.DEFAULT_BASE_URL
+        self.base_url = base_url.rstrip("/")
+        self.REGISTER_URL = f"{self.base_url}/register"
+        self.LOGIN_URL = f"{self.DEFAULT_BASE_URL}/login"
+        self.REGION_FROM_LOC_URL = f"{self.base_url}{self.REGION_FROM_LOC_PATH}"
+        self.FORECAST_URL = f"{self.base_url}{self.FORECAST_PATH}"
         if self.username and self.password and self.user_email and self.org:
             self.token = self.authenticate()
 
@@ -77,6 +79,7 @@ class WattTimeClient:
             'org': self.org
         }
         register_response = self.session.post(self.REGISTER_URL, json=register_params, timeout=self.timeout)
+        print(f"WattTime registration response: {register_response.status_code} - {register_response.text}")
         if register_response.status_code not in [200, 201, 409]:  # 409 means already registered
             register_response.raise_for_status()
 
@@ -108,9 +111,11 @@ class WattTimeClient:
             "longitude": coordinates[1]
         }
         response = self.session.get(self.REGION_FROM_LOC_URL, headers=headers, params=params, timeout=self.timeout)
+        print(f"[DEBUG] Region request: {self.REGION_FROM_LOC_URL} coords={coordinates} status={response.status_code}")
         response.raise_for_status()
         payload = response.json()
         region = payload.get("region")
+        print(f"[DEBUG] Got region: {region} from payload: {payload}")
         if region:
             self._region_cache[coordinates] = (region, time.time())
         return region
@@ -128,41 +133,31 @@ class WattTimeClient:
             "horizon_hours": min(horizon_hours, 72)  # Max 72 hours
         }
         response = self.session.get(self.FORECAST_URL, headers=headers, params=params, timeout=self.timeout)
+        print(f"[DEBUG] Forecast request: {self.FORECAST_URL} region={region} status={response.status_code} content-type={response.headers.get('content-type')} response_len={len(response.text)}")
+        if response.status_code != 200:
+            print(f"[DEBUG] Response text: {response.text[:500]}")
         response.raise_for_status()
         payload = response.json()
         return payload.get("data", [])
 
-    def get_ba_id(self, coordinates: Tuple[float, float]) -> Optional[str]:
-        # Check cache (valid for 1 hour)
-        if coordinates in self._cache:
-            ba_id, timestamp = self._cache[coordinates]
-            if time.time() - timestamp < 3600:
-                return ba_id
-
-        token = self._ensure_token()
-        headers = {"Authorization": f"Bearer {token}"}
-        params = {"latitude": coordinates[0], "longitude": coordinates[1]}
-        response = self.session.get(self.BA_LOOKUP_URL, headers=headers, params=params, timeout=self.timeout)
-        response.raise_for_status()
-        payload = response.json()
-        items = payload.get("data", [])
-        ba_id = items[0].get("id") if items else None
-        if ba_id:
-            self._cache[coordinates] = (ba_id, time.time())
-        return ba_id
-
     def get_intensity(self, zone: str, coordinates: Tuple[float, float]) -> float:
-        ba_id = self.get_ba_id(coordinates)
-        if not ba_id:
-            raise RuntimeError(f"Unable to resolve WattTime BA for zone {zone}.")
-
-        token = self._ensure_token()
-        headers = {"Authorization": f"Bearer {token}"}
-        url = self.BA_LATEST_URL.format(ba_id=ba_id)
-        response = self.session.get(url, headers=headers, timeout=self.timeout)
-        response.raise_for_status()
-        payload = response.json()
-        return float(payload.get("data", {}).get("carbonIntensity", 0.0))
+        """
+        Get current carbon intensity using forecast data (WattTime v3 documented API).
+        Extracts the first forecast point which represents current/near-term intensity.
+        """
+        try:
+            forecast_data = self.get_forecast(coordinates)
+            if forecast_data and len(forecast_data) > 0:
+                first_point = forecast_data[0]
+                value = float(first_point.get("value", 0.0))
+                return max(0.0, value)
+        except Exception:
+            pass
+        
+        raise RuntimeError(
+            f"Unable to fetch WattTime carbon intensity for zone {zone}. "
+            "Ensure region is valid and forecast data is available."
+        )
 
 
 class CarbonIntensityMonitor:
