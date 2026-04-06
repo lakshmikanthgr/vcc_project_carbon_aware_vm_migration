@@ -1,6 +1,8 @@
 import argparse
 from typing import Any, Dict, List
 
+from dotenv import load_dotenv
+
 from decision_engine import DecisionEngine
 from migration_cost_estimator import MigrationCostEstimator
 from orchestrator import Orchestrator
@@ -153,6 +155,8 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    # Load environment variables from .env file
+    load_dotenv()
     args = parse_args()
     engine = DecisionEngine(MigrationCostEstimator(network_capacity_mbps=1000.0), SlaTierClassifier())
 

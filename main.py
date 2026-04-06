@@ -1,8 +1,12 @@
+from dotenv import load_dotenv
+
 from orchestrator import Orchestrator
 from simulation import simulate_happy_sad_and_sla_blocked_paths, simulate_real_case
 
 
 def main() -> None:
+    # Load environment variables from .env file
+    load_dotenv()
     orchestrator = Orchestrator()
     sample_vms = [
         {
