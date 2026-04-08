@@ -1,3 +1,5 @@
+import os
+
 from dotenv import load_dotenv
 
 from orchestrator import Orchestrator
@@ -248,6 +250,12 @@ def main() -> None:
             "forecast_horizon_hours": 3.0,
             "sla_contract": {"latency_ms": 15, "critical": True},
             "runtime_metrics": {"cpu_utilization": 72.0, "dirty_rate": 20.0, "headroom": 25.0},
+            # Optional GCP metadata for real migration execution
+            "gcp_project_id": os.getenv("GCP_PROJECT_ID", "your-gcp-project-id"),
+            "gcp_instance_name": os.getenv("GCP_INSTANCE_NAME", "your-instance-name"),
+            "gcp_source_zone": os.getenv("GCP_SOURCE_ZONE", "europe-north1-b"),
+            "gcp_target_zone": os.getenv("GCP_TARGET_ZONE", "europe-north1-c"),
+            "gcp_target_instance_name": os.getenv("GCP_TARGET_INSTANCE_NAME", "your-instance-name-migrated"),
         },
         {
             "id": "vm-2",
