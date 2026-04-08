@@ -58,7 +58,7 @@
     <div class="container">
         <header>
             <h1>🌱 Carbon-Aware VM Migration Report</h1>
-            <p>Generated on 2026-04-06 22:09:37</p>
+            <p>Generated on 2026-04-08 22:13:39</p>
         </header>
 
         <div class="summary">
@@ -95,28 +95,67 @@
                 <div class="intensity-values">
                     <div class="intensity-card">
                         <div class="zone">DK-DK1 (Current)</div>
-                        <div class="value">8.5</div>
-                        <div class="unit">gCO2/MWh (current) | Avg: 8.5</div>
+                        <div class="value">48.5</div>
+                        <div class="unit">gCO2/MWh (current) | Avg: 48.5</div>
+                        <div class="unit">📊 Current Intensity from WattTime/ElectricityMaps API</div>
                     </div>
 
                     <div class="intensity-card">
                         <div class="zone">DE</div>
-                        <div class="value">22.0</div>
-                        <div class="unit">gCO2/MWh (current) | Avg: 22.0 | Diff: -13.5 (-158.8%)</div>
+                        <div class="value">13.0</div>
+                        <div class="unit">gCO2/MWh (current) | Avg: 13.0 | Diff: +35.5 (+73.2%)</div>
                     </div>
 
                     <div class="intensity-card">
                         <div class="zone">SE</div>
-                        <div class="value">31.0</div>
-                        <div class="unit">gCO2/MWh (current) | Avg: 31.0 | Diff: -22.5 (-264.7%)</div>
+                        <div class="value">34.0</div>
+                        <div class="unit">gCO2/MWh (current) | Avg: 34.0 | Diff: +14.5 (+29.9%)</div>
                     </div>
 
                     <div class="intensity-card">
                         <div class="zone">US-AK</div>
-                        <div class="value">96.1</div>
-                        <div class="unit">gCO2/MWh (current) | Avg: 96.1 | Diff: -87.6 (-1030.3%)</div>
+                        <div class="value">128.6</div>
+                        <div class="unit">gCO2/MWh (current) | Avg: 128.6 | Diff: -80.1 (-165.1%)</div>
                     </div>
 
+                </div>
+
+                <div class="candidate-zones" style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                    <h4 style="color: #856404; margin-bottom: 15px;">🔍 API Measurements</h4>
+                    <table class="candidate-table">
+                        <thead>
+                            <tr>
+                                <th>Data Source</th>
+                                <th>CO2 Intensity (gCO2/MWh)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <td class="zone-name">ElectricityMaps</td>
+                                <td>0.0</td>
+                                <td><span class="sla-check positive" style="padding: 5px 10px;">✓ Live</span></td>
+                            </tr>
+
+                            <tr>
+                                <td class="zone-name">WattTime</td>
+                                <td>97.0</td>
+                                <td><span class="sla-check positive" style="padding: 5px 10px;">✓ Live</span></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="candidate-zones" style="margin-top: 30px; padding: 20px; background: #f0f7ff; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                    <h4 style="color: #17a2b8; margin-bottom: 15px;">📡 Data Sources</h4>
+                    <div style="font-size: 13px; line-height: 1.8; color: #555;">
+                        <div style="margin-bottom: 10px;"><strong>WattTime API:</strong> Provides real-time carbon signal index and region-based intensity</div>
+                        <div style="margin-bottom: 10px;"><strong>ElectricityMaps API:</strong> Fallback source for carbon intensity data</div>
+                        <div style="margin-bottom: 10px;"><strong>Aggregation Method:</strong> Average of both sources for reliability</div>
+                        <div><strong>Update Frequency:</strong> Polled every 5 minutes or on-demand</div>
+                    </div>
                 </div>
 
                 <div class="candidate-zones">
@@ -137,30 +176,30 @@
 
                             <tr>
                                 <td class="zone-name">DE</td>
-                                <td>22.0</td>
-                                <td class="neutral">0.0</td>
-                                <td>2448.0</td>
-                                <td class="negative">-2448.0</td>
+                                <td>13.0</td>
+                                <td class="positive">133.1</td>
+                                <td>13968.0</td>
+                                <td class="negative">-13834.9</td>
                                 <td><span class="sla-check pass">✓ Pass</span></td>
                                 <td>✗ No</td>
                             </tr>
 
                             <tr>
                                 <td class="zone-name">SE</td>
-                                <td>31.0</td>
-                                <td class="neutral">0.0</td>
-                                <td>2448.0</td>
-                                <td class="negative">-2448.0</td>
+                                <td>34.0</td>
+                                <td class="positive">54.4</td>
+                                <td>13968.0</td>
+                                <td class="negative">-13913.6</td>
                                 <td><span class="sla-check pass">✓ Pass</span></td>
                                 <td>✗ No</td>
                             </tr>
 
                             <tr>
                                 <td class="zone-name">US-AK</td>
-                                <td>96.1</td>
+                                <td>128.6</td>
                                 <td class="neutral">0.0</td>
-                                <td>2448.0</td>
-                                <td class="negative">-2448.0</td>
+                                <td>13968.0</td>
+                                <td class="negative">-13968.0</td>
                                 <td><span class="sla-check pass">✓ Pass</span></td>
                                 <td>✗ No</td>
                             </tr>
@@ -196,28 +235,67 @@
                 <div class="intensity-values">
                     <div class="intensity-card">
                         <div class="zone">DE (Current)</div>
-                        <div class="value">22.0</div>
-                        <div class="unit">gCO2/MWh (current) | Avg: 22.0</div>
+                        <div class="value">13.0</div>
+                        <div class="unit">gCO2/MWh (current) | Avg: 13.0</div>
+                        <div class="unit">📊 Current Intensity from WattTime/ElectricityMaps API</div>
                     </div>
 
                     <div class="intensity-card">
                         <div class="zone">DK-DK1</div>
-                        <div class="value">8.5</div>
-                        <div class="unit">gCO2/MWh (current) | Avg: 8.5 | Diff: +13.5 (+61.4%)</div>
+                        <div class="value">48.5</div>
+                        <div class="unit">gCO2/MWh (current) | Avg: 48.5 | Diff: -35.5 (-273.1%)</div>
                     </div>
 
                     <div class="intensity-card">
                         <div class="zone">SE</div>
-                        <div class="value">31.0</div>
-                        <div class="unit">gCO2/MWh (current) | Avg: 31.0 | Diff: -9.0 (-40.9%)</div>
+                        <div class="value">34.0</div>
+                        <div class="unit">gCO2/MWh (current) | Avg: 34.0 | Diff: -21.0 (-161.5%)</div>
                     </div>
 
                     <div class="intensity-card">
                         <div class="zone">US-AK</div>
-                        <div class="value">96.1</div>
-                        <div class="unit">gCO2/MWh (current) | Avg: 96.1 | Diff: -74.1 (-336.7%)</div>
+                        <div class="value">128.6</div>
+                        <div class="unit">gCO2/MWh (current) | Avg: 128.6 | Diff: -115.6 (-888.9%)</div>
                     </div>
 
+                </div>
+
+                <div class="candidate-zones" style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                    <h4 style="color: #856404; margin-bottom: 15px;">🔍 API Measurements</h4>
+                    <table class="candidate-table">
+                        <thead>
+                            <tr>
+                                <th>Data Source</th>
+                                <th>CO2 Intensity (gCO2/MWh)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <td class="zone-name">ElectricityMaps</td>
+                                <td>0.0</td>
+                                <td><span class="sla-check positive" style="padding: 5px 10px;">✓ Live</span></td>
+                            </tr>
+
+                            <tr>
+                                <td class="zone-name">WattTime</td>
+                                <td>26.0</td>
+                                <td><span class="sla-check positive" style="padding: 5px 10px;">✓ Live</span></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="candidate-zones" style="margin-top: 30px; padding: 20px; background: #f0f7ff; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                    <h4 style="color: #17a2b8; margin-bottom: 15px;">📡 Data Sources</h4>
+                    <div style="font-size: 13px; line-height: 1.8; color: #555;">
+                        <div style="margin-bottom: 10px;"><strong>WattTime API:</strong> Provides real-time carbon signal index and region-based intensity</div>
+                        <div style="margin-bottom: 10px;"><strong>ElectricityMaps API:</strong> Fallback source for carbon intensity data</div>
+                        <div style="margin-bottom: 10px;"><strong>Aggregation Method:</strong> Average of both sources for reliability</div>
+                        <div><strong>Update Frequency:</strong> Polled every 5 minutes or on-demand</div>
+                    </div>
                 </div>
 
                 <div class="candidate-zones">
@@ -238,30 +316,30 @@
 
                             <tr>
                                 <td class="zone-name">DK-DK1</td>
-                                <td>8.5</td>
-                                <td class="positive">48.6</td>
-                                <td>6336.0</td>
-                                <td class="negative">-6287.4</td>
+                                <td>48.5</td>
+                                <td class="neutral">0.0</td>
+                                <td>3744.0</td>
+                                <td class="negative">-3744.0</td>
                                 <td><span class="sla-check pass">✓ Pass</span></td>
                                 <td>✗ No</td>
                             </tr>
 
                             <tr>
                                 <td class="zone-name">SE</td>
-                                <td>31.0</td>
+                                <td>34.0</td>
                                 <td class="neutral">0.0</td>
-                                <td>6336.0</td>
-                                <td class="negative">-6336.0</td>
+                                <td>3744.0</td>
+                                <td class="negative">-3744.0</td>
                                 <td><span class="sla-check pass">✓ Pass</span></td>
                                 <td>✗ No</td>
                             </tr>
 
                             <tr>
                                 <td class="zone-name">US-AK</td>
-                                <td>96.1</td>
+                                <td>128.6</td>
                                 <td class="neutral">0.0</td>
-                                <td>6336.0</td>
-                                <td class="negative">-6336.0</td>
+                                <td>3744.0</td>
+                                <td class="negative">-3744.0</td>
                                 <td><span class="sla-check pass">✓ Pass</span></td>
                                 <td>✗ No</td>
                             </tr>
@@ -297,28 +375,67 @@
                 <div class="intensity-values">
                     <div class="intensity-card">
                         <div class="zone">SE (Current)</div>
-                        <div class="value">31.0</div>
-                        <div class="unit">gCO2/MWh (current) | Avg: 31.0</div>
+                        <div class="value">34.0</div>
+                        <div class="unit">gCO2/MWh (current) | Avg: 34.0</div>
+                        <div class="unit">📊 Current Intensity from WattTime/ElectricityMaps API</div>
                     </div>
 
                     <div class="intensity-card">
                         <div class="zone">DK-DK1</div>
-                        <div class="value">8.5</div>
-                        <div class="unit">gCO2/MWh (current) | Avg: 8.5 | Diff: +22.5 (+72.6%)</div>
+                        <div class="value">48.5</div>
+                        <div class="unit">gCO2/MWh (current) | Avg: 48.5 | Diff: -14.5 (-42.6%)</div>
                     </div>
 
                     <div class="intensity-card">
                         <div class="zone">DE</div>
-                        <div class="value">22.0</div>
-                        <div class="unit">gCO2/MWh (current) | Avg: 22.0 | Diff: +9.0 (+29.0%)</div>
+                        <div class="value">13.0</div>
+                        <div class="unit">gCO2/MWh (current) | Avg: 13.0 | Diff: +21.0 (+61.8%)</div>
                     </div>
 
                     <div class="intensity-card">
                         <div class="zone">US-AK</div>
-                        <div class="value">96.1</div>
-                        <div class="unit">gCO2/MWh (current) | Avg: 96.1 | Diff: -65.1 (-209.9%)</div>
+                        <div class="value">128.6</div>
+                        <div class="unit">gCO2/MWh (current) | Avg: 128.6 | Diff: -94.6 (-278.1%)</div>
                     </div>
 
+                </div>
+
+                <div class="candidate-zones" style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                    <h4 style="color: #856404; margin-bottom: 15px;">🔍 API Measurements</h4>
+                    <table class="candidate-table">
+                        <thead>
+                            <tr>
+                                <th>Data Source</th>
+                                <th>CO2 Intensity (gCO2/MWh)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <tr>
+                                <td class="zone-name">ElectricityMaps</td>
+                                <td>0.0</td>
+                                <td><span class="sla-check positive" style="padding: 5px 10px;">✓ Live</span></td>
+                            </tr>
+
+                            <tr>
+                                <td class="zone-name">WattTime</td>
+                                <td>68.0</td>
+                                <td><span class="sla-check positive" style="padding: 5px 10px;">✓ Live</span></td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="candidate-zones" style="margin-top: 30px; padding: 20px; background: #f0f7ff; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                    <h4 style="color: #17a2b8; margin-bottom: 15px;">📡 Data Sources</h4>
+                    <div style="font-size: 13px; line-height: 1.8; color: #555;">
+                        <div style="margin-bottom: 10px;"><strong>WattTime API:</strong> Provides real-time carbon signal index and region-based intensity</div>
+                        <div style="margin-bottom: 10px;"><strong>ElectricityMaps API:</strong> Fallback source for carbon intensity data</div>
+                        <div style="margin-bottom: 10px;"><strong>Aggregation Method:</strong> Average of both sources for reliability</div>
+                        <div><strong>Update Frequency:</strong> Polled every 5 minutes or on-demand</div>
+                    </div>
                 </div>
 
                 <div class="candidate-zones">
@@ -339,30 +456,30 @@
 
                             <tr>
                                 <td class="zone-name">DK-DK1</td>
-                                <td>8.5</td>
-                                <td class="positive">31.5</td>
-                                <td>8928.0</td>
-                                <td class="negative">-8896.5</td>
+                                <td>48.5</td>
+                                <td class="neutral">0.0</td>
+                                <td>9792.0</td>
+                                <td class="negative">-9792.0</td>
                                 <td><span class="sla-check pass">✓ Pass</span></td>
                                 <td>✗ No</td>
                             </tr>
 
                             <tr>
                                 <td class="zone-name">DE</td>
-                                <td>22.0</td>
-                                <td class="positive">12.6</td>
-                                <td>8928.0</td>
-                                <td class="negative">-8915.4</td>
+                                <td>13.0</td>
+                                <td class="positive">29.4</td>
+                                <td>9792.0</td>
+                                <td class="negative">-9762.6</td>
                                 <td><span class="sla-check pass">✓ Pass</span></td>
                                 <td>✗ No</td>
                             </tr>
 
                             <tr>
                                 <td class="zone-name">US-AK</td>
-                                <td>96.1</td>
+                                <td>128.6</td>
                                 <td class="neutral">0.0</td>
-                                <td>8928.0</td>
-                                <td class="negative">-8928.0</td>
+                                <td>9792.0</td>
+                                <td class="negative">-9792.0</td>
                                 <td><span class="sla-check pass">✓ Pass</span></td>
                                 <td>✗ No</td>
                             </tr>
@@ -379,174 +496,9 @@
             </div>
         </div>
 
-        <div class="vm-section">
-            <div class="vm-header">
-                <h2>🧪 Simulation Scenarios (Test Data)</h2>
-                <p style="margin: 10px 0; color: #666; font-size: 14px;">These scenarios use artificial test data to demonstrate different migration outcomes</p>
-            </div>
-
-            <div class="vm-content">
-        
-                <div class="scenario-section" style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #17a2b8;">
-                    <h3 style="margin-bottom: 15px; color: #17a2b8; font-size: 16px;">Happy Path Scenario</h3>
-                    
-                    <div class="scenario-vm" style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
-                            <div><strong>VM:</strong> vm-happy</div>
-                            <div><strong>Current Zone:</strong> DK-DK1</div>
-                            <div><strong>Size:</strong> 8.0 GB</div>
-                            <div><strong>Power:</strong> 1.0 kW</div>
-                            <div><strong>SLA Tier:</strong> SILVER</div>
-                        </div>
-                        
-                        <div class="intensity-values" style="margin-bottom: 20px;">
-                            <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 10px;">Test Carbon Intensities (gCO2/MWh)</h4>
-        
-                            <div class="intensity-card" style="display: inline-block; margin: 5px; padding: 10px; background: #e9ecef; border-radius: 4px;">
-                                <div class="zone" style="font-weight: 600;">DK-DK1</div>
-                                <div class="value" style="font-size: 16px; color: #17a2b8;">320.0</div>
-                            </div>
-        
-                            <div class="intensity-card" style="display: inline-block; margin: 5px; padding: 10px; background: #e9ecef; border-radius: 4px;">
-                                <div class="zone" style="font-weight: 600;">SE</div>
-                                <div class="value" style="font-size: 16px; color: #17a2b8;">80.0</div>
-                            </div>
-        
-                            <div class="intensity-card" style="display: inline-block; margin: 5px; padding: 10px; background: #e9ecef; border-radius: 4px;">
-                                <div class="zone" style="font-weight: 600;">DE</div>
-                                <div class="value" style="font-size: 16px; color: #17a2b8;">200.0</div>
-                            </div>
-        
-                            <div class="intensity-card" style="display: inline-block; margin: 5px; padding: 10px; background: #e9ecef; border-radius: 4px;">
-                                <div class="zone" style="font-weight: 600;">US-AK</div>
-                                <div class="value" style="font-size: 16px; color: #17a2b8;">150.0</div>
-                            </div>
-        
-                        </div>
-                        
-                        <div class="decision-box " style="margin-top: 15px;">
-                            <h4>Decision: ✓ MIGRATE</h4>
-                            <div class="decision-text">Move from DK-DK1 to SE yields 250.8 gCO2 savings with estimated downtime 5.5s for SLA tier Silver.</div>
-        
-                            <div class="breakdown" style="margin-top: 15px;">
-                                <h5>Migration Details</h5>
-                                <div class="breakdown-row">
-                                    <div class="label">Source Zone:</div>
-                                    <div class="value">DK-DK1</div>
-                                </div>
-                                <div class="breakdown-row">
-                                    <div class="label">Target Zone:</div>
-                                    <div class="value">SE</div>
-                                </div>
-                                <div class="breakdown-row">
-                                    <div class="label">Net Carbon Saving:</div>
-                                    <div class="value">250.8 gCO2</div>
-                                </div>
-                                <div class="breakdown-row">
-                                    <div class="label">Estimated Downtime:</div>
-                                    <div class="value">5.5 seconds</div>
-                                </div>
-                            </div>
-        
-                        </div>
-                    </div>
-                </div>
-        
-                <div class="scenario-section" style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #17a2b8;">
-                    <h3 style="margin-bottom: 15px; color: #17a2b8; font-size: 16px;">Sad Path Scenario</h3>
-                    
-                    <div class="scenario-vm" style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
-                            <div><strong>VM:</strong> vm-sad</div>
-                            <div><strong>Current Zone:</strong> DK-DK1</div>
-                            <div><strong>Size:</strong> 16.0 GB</div>
-                            <div><strong>Power:</strong> 1.2 kW</div>
-                            <div><strong>SLA Tier:</strong> GOLD</div>
-                        </div>
-                        
-                        <div class="intensity-values" style="margin-bottom: 20px;">
-                            <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 10px;">Test Carbon Intensities (gCO2/MWh)</h4>
-        
-                            <div class="intensity-card" style="display: inline-block; margin: 5px; padding: 10px; background: #e9ecef; border-radius: 4px;">
-                                <div class="zone" style="font-weight: 600;">DK-DK1</div>
-                                <div class="value" style="font-size: 16px; color: #17a2b8;">280.0</div>
-                            </div>
-        
-                            <div class="intensity-card" style="display: inline-block; margin: 5px; padding: 10px; background: #e9ecef; border-radius: 4px;">
-                                <div class="zone" style="font-weight: 600;">SE</div>
-                                <div class="value" style="font-size: 16px; color: #17a2b8;">90.0</div>
-                            </div>
-        
-                            <div class="intensity-card" style="display: inline-block; margin: 5px; padding: 10px; background: #e9ecef; border-radius: 4px;">
-                                <div class="zone" style="font-weight: 600;">DE</div>
-                                <div class="value" style="font-size: 16px; color: #17a2b8;">210.0</div>
-                            </div>
-        
-                            <div class="intensity-card" style="display: inline-block; margin: 5px; padding: 10px; background: #e9ecef; border-radius: 4px;">
-                                <div class="zone" style="font-weight: 600;">US-AK</div>
-                                <div class="value" style="font-size: 16px; color: #17a2b8;">160.0</div>
-                            </div>
-        
-                        </div>
-                        
-                        <div class="decision-box rejected" style="margin-top: 15px;">
-                            <h4>Decision: ✗ NO MIGRATION</h4>
-                            <div class="decision-text">No candidate zone produced net carbon savings while preserving SLA guarantees.</div>
-        
-                        </div>
-                    </div>
-                </div>
-        
-                <div class="scenario-section" style="margin-bottom: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #17a2b8;">
-                    <h3 style="margin-bottom: 15px; color: #17a2b8; font-size: 16px;">SLA-Blocked Scenario</h3>
-                    
-                    <div class="scenario-vm" style="background: white; padding: 15px; border-radius: 6px; margin-bottom: 15px;">
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
-                            <div><strong>VM:</strong> vm-sla-blocked</div>
-                            <div><strong>Current Zone:</strong> DK-DK1</div>
-                            <div><strong>Size:</strong> 64.0 GB</div>
-                            <div><strong>Power:</strong> 1.5 kW</div>
-                            <div><strong>SLA Tier:</strong> GOLD</div>
-                        </div>
-                        
-                        <div class="intensity-values" style="margin-bottom: 20px;">
-                            <h4 style="font-size: 14px; font-weight: 600; margin-bottom: 10px;">Test Carbon Intensities (gCO2/MWh)</h4>
-        
-                            <div class="intensity-card" style="display: inline-block; margin: 5px; padding: 10px; background: #e9ecef; border-radius: 4px;">
-                                <div class="zone" style="font-weight: 600;">DK-DK1</div>
-                                <div class="value" style="font-size: 16px; color: #17a2b8;">320.0</div>
-                            </div>
-        
-                            <div class="intensity-card" style="display: inline-block; margin: 5px; padding: 10px; background: #e9ecef; border-radius: 4px;">
-                                <div class="zone" style="font-weight: 600;">SE</div>
-                                <div class="value" style="font-size: 16px; color: #17a2b8;">100.0</div>
-                            </div>
-        
-                            <div class="intensity-card" style="display: inline-block; margin: 5px; padding: 10px; background: #e9ecef; border-radius: 4px;">
-                                <div class="zone" style="font-weight: 600;">DE</div>
-                                <div class="value" style="font-size: 16px; color: #17a2b8;">180.0</div>
-                            </div>
-        
-                            <div class="intensity-card" style="display: inline-block; margin: 5px; padding: 10px; background: #e9ecef; border-radius: 4px;">
-                                <div class="zone" style="font-weight: 600;">US-AK</div>
-                                <div class="value" style="font-size: 16px; color: #17a2b8;">140.0</div>
-                            </div>
-        
-                        </div>
-                        
-                        <div class="decision-box rejected" style="margin-top: 15px;">
-                            <h4>Decision: ✗ NO MIGRATION</h4>
-                            <div class="decision-text">No candidate zone produced net carbon savings while preserving SLA guarantees.</div>
-        
-                        </div>
-                    </div>
-                </div>
-        
-            </div>
-        </div>
-        
         <footer>
             <p>This report shows detailed carbon intensity and migration cost calculations.</p>
+            <p>Carbon intensity data sourced from <strong>WattTime API</strong> and <strong>ElectricityMaps API</strong> with real-time hourly updates.</p>
             <p>All values are based on current API data and forecasting models.</p>
         </footer>
     </div>

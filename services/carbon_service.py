@@ -142,6 +142,7 @@ class WattTimeClient:
         payload = response.json()
         # Signal-index returns data as a list with one point
         data = payload.get("data", [])
+        print(f"[Lks] Signal-index response data: {data}")
         if data and isinstance(data, list) and len(data) > 0:
             return float(data[0].get("value", 0.0))
         return None
@@ -170,6 +171,7 @@ class CarbonIntensityMonitor:
         self.poll_interval = poll_interval  # seconds between polls
         self.latest = {zone: 0.0 for zone in self.zones}
         self.history = {zone: [] for zone in self.zones}
+        self.latest_measurements = {zone: [] for zone in self.zones}  # Store individual API measurements
         self.last_poll = 0.0
         self.electricitymaps_client = ElectricityMapsClient(os.getenv("ELECTRICITYMAPS_API_KEY"))
         self.watttime_client = WattTimeClient(
@@ -221,6 +223,7 @@ class CarbonIntensityMonitor:
             measurements = [self.fetch_electricitymaps(zone), self.fetch_watttime(zone)]
             intensity = self.aggregate_intensity(measurements)
             self.latest[zone] = intensity
+            self.latest_measurements[zone] = measurements  # Store individual measurements
             self.history[zone].append(intensity)
             zone_intensities[zone] = intensity
         self.last_poll = current_time
@@ -235,4 +238,8 @@ class CarbonIntensityMonitor:
 
     def get_history(self, zone: str) -> List[float]:
         return self.history.get(zone, [])
+
+    def get_measurements(self, zone: str) -> List[Dict[str, float]]:
+        """Get individual API measurements (WattTime, ElectricityMaps) for a zone."""
+        return self.latest_measurements.get(zone, [])
 

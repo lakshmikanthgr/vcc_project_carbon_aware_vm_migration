@@ -17,6 +17,7 @@ The framework continuously monitors real-time carbon intensity signals (gCO₂eq
    - Polls ElectricityMaps and WattTime APIs for zone-level carbon intensity data
    - Supports WattTime v3 API with region-from-loc and signal-index endpoints
    - Aggregates readings from multiple sources for reliability
+   - Tracks individual API measurements (WattTime CO2 and ElectricityMaps CO2) for transparency
    - Maintains history for forecasting
    - Falls back to synthetic data if APIs are unavailable
    - Currently monitors zones: DK-DK1 (Denmark), DE (Germany), SE (Sweden), US-AK (Alaska)
@@ -53,8 +54,15 @@ The framework continuously monitors real-time carbon intensity signals (gCO₂eq
 
 8. **Report Generator** (`report_generator.py`)
    - Generates detailed HTML reports with migration decision analysis
-   - Shows live API data vs. simulation test scenarios
-   - Includes carbon intensity comparisons, SLA checks, and cost calculations
+   - Creates two report types:
+     - Live data report: Real API measurements from WattTime and ElectricityMaps
+     - Simulated data report: Test scenarios with predefined intensities
+   - Displays individual API measurements with source attribution:
+     - WattTime CO2 intensity values (gCO2/MWh)
+     - ElectricityMaps CO2 intensity values (gCO2/MWh)
+     - Status indicators (✓ Live or ⚠️ Fallback)
+   - Shows carbon intensity comparisons across zones
+   - Includes SLA checks and migration cost calculations
    - Provides visual breakdown of why migrations are approved or rejected
 
 9. **Simulation Module** (`simulation.py`)
@@ -123,18 +131,114 @@ VMs are migrated only when ALL conditions are met:
 - **Run all simulations**: `python simulation.py`
 - **Run specific scenario**: `python simulation.py --sla-blocked`
 - **Run full orchestrator with live data**: `python main.py`
-- **View detailed migration report**: Open `migration_report.html` in a web browser after running `main.py`
+- **View live data report**: Open `migration_report_live.html` in a web browser (shows real API data)
+- **View simulated test report**: Open `migration_report_simulated.html` in a web browser (shows test scenarios)
+- **Compare reports**: Open both reports side-by-side to compare live vs. simulated scenarios
 - **Train and forecast**: The orchestrator auto-trains the TCN when history is sufficient
 
 ## Report Features
-The framework generates comprehensive HTML reports showing:
-- **Live Data Analysis**: Real-time carbon intensity from APIs with detailed calculations
-- **Simulation Scenarios**: Test data demonstrating happy/sad/SLA-blocked migration outcomes
-- **Decision Breakdown**: Step-by-step reasoning for each migration decision
-- **SLA Compliance**: Downtime limits and carbon cost calculations
-- **Visual Dashboard**: Color-coded results with professional styling
 
-Reports are automatically saved as `migration_report.html` and can be opened in any web browser.
+The framework generates two comprehensive HTML reports with detailed migration analysis:
+
+### 📊 Report Types
+
+#### 1. **Live Data Report** (`migration_report_live.html`)
+Analyzes real-time carbon intensity data fetched from external APIs:
+- **Real Carbon Intensity Data**: WattTime and ElectricityMaps CO2 measurements (gCO2/MWh)
+- **Live API Measurements Table**: Shows individual readings from each data source
+  - WattTime API: Real-time carbon signal index
+  - ElectricityMaps API: Carbon intensity from grid monitoring
+  - Data source status indicators (✓ Live or ⚠️ Fallback)
+- **Zone Comparison**: Current and forecasted intensities across all regions
+- **Migration Decisions**: Based on actual live carbon data
+- **Aggregated Data**: Average of WattTime and ElectricityMaps for final decision-making
+
+#### 2. **Simulated Data Report** (`migration_report_simulated.html`)
+Demonstrates different migration scenarios with predefined test data:
+- **Happy Path**: VM successfully migrates with carbon savings
+- **Sad Path**: No migration due to insufficient carbon benefits
+- **SLA-Blocked Path**: Migration blocked by strict SLA constraints
+- **Test Intensities**: Artificial carbon values to showcase different outcomes
+
+### 📡 API Data Displayed in Reports
+
+Each VM analysis includes a dedicated **API Measurements** section showing:
+
+| Data Source | CO2 Intensity (gCO2/MWh) | Status |
+|---|---|---|
+| **ElectricityMaps** | Real value from API | ✓ Live |
+| **WattTime** | Real value from API | ✓ Live |
+
+**Example Output** (from Live Report):
+- DK-DK1: ElectricityMaps (0.0) | WattTime (97.0 gCO2/MWh)
+- DE: ElectricityMaps (0.0) | WattTime (26.0 gCO2/MWh)
+- SE: ElectricityMaps (0.0) | WattTime (68.0 gCO2/MWh)
+
+### 📋 Report Contents
+
+Both reports include:
+
+1. **Summary Dashboard**
+   - Total VMs analyzed
+   - Number of migrations recommended
+   - Total potential carbon savings (gCO2)
+
+2. **Per-VM Analysis**
+   - VM metadata (ID, zone, size, power consumption, SLA tier)
+   - Current and forecasted carbon intensities
+   - **🔍 API Measurements**: Individual readings from WattTime and ElectricityMaps APIs
+   - **📡 Data Sources**: Explanation of data sources and aggregation method
+   - Candidate zone evaluation table with:
+     - Target zone intensity (average)
+     - Projected carbon savings
+     - Migration cost in gCO2
+     - Net carbon saving (savings - cost)
+     - SLA compliance check
+     - Feasibility status
+
+3. **Decision Breakdown**
+   - ✓ MIGRATE or ✗ NO MIGRATION decision
+   - Reason for decision (why migration was approved/rejected)
+   - If migrating: target zone, downtime, and net savings
+
+4. **Data Source Attribution**
+   - Update frequency (polled every 5 minutes)
+   - Fallback behavior when APIs are unavailable
+   - Aggregation method (average of both sources)
+
+### 🔧 How API Data is Processed
+
+```
+WattTime API → Fetch signal-index (gCO2/MWh for region)
+ElectricityMaps API → Fetch carbon-intensity (gCO2/MWh for zone)
+                     ↓
+          Aggregate: (WattTime + ElectricityMaps) / 2
+                     ↓
+            Final Carbon Intensity Value
+                     ↓
+        Used in Migration Decision Logic
+```
+
+### 📍 Zones & Coordinates Monitored
+
+The reports track carbon intensities across these regions:
+- **DK-DK1**: Denmark (56.0°N, 8.5°E)
+- **DE**: Germany (51.17°N, 10.45°E)
+- **SE**: Sweden (60.13°N, 18.64°E)
+- **US-AK**: Alaska (64.20°N, -152.28°W)
+
+### 💡 Key Metrics Explained
+
+- **gCO2/MWh**: Grams of CO2 equivalent per megawatt-hour of electricity
+- **Projected Savings**: (Source Intensity - Target Intensity) × Power × Runtime
+- **Migration Cost**: Carbon cost of transferring data during migration
+- **Net Saving**: Operational savings minus migration overhead
+- **SLA Tier Limits**:
+  - Gold: ≤60 seconds downtime (critical workloads)
+  - Silver: ≤180 seconds downtime (moderate sensitivity)
+  - Bronze: Flexible (non-sensitive workloads)
+
+Reports are automatically saved as `migration_report_live.html` and `migration_report_simulated.html` and can be opened in any web browser.
 
 ## Future Enhancements
 - Integrate with real VM orchestration platforms (e.g., OpenStack, Kubernetes)
@@ -180,7 +284,17 @@ python simulation.py --real       # Uses orchestrator with current data
 
 - **API Integration**: Set `ELECTRICITYMAPS_API_KEY` and WattTime credentials in `.env` for live data
 - **Fallback Behavior**: Uses synthetic data when APIs are unavailable
-- **Report Viewing**: Open `migration_report.html` in any web browser after running `main.py`
+- **Report Viewing**: Open `migration_report_live.html` or `migration_report_simulated.html` in any web browser
+  - Live report shows real API measurements (WattTime and ElectricityMaps CO2 values)
+  - Simulated report demonstrates different migration scenarios with test data
+- **API Measurements Table**: Both reports display individual API readings with source attribution and status indicators
+- **Data Sources**: Each VM section includes a table showing:
+  - WattTime API CO2 intensity (gCO2/MWh)
+  - ElectricityMaps API CO2 intensity (gCO2/MWh)
+  - Live/Fallback status for each source
 - **TCN Training**: Automatically trains on historical data when sufficient samples are available
 - **Decision Logic**: Only migrates when carbon savings > migration costs AND SLA constraints satisfied
+- **Report Generation**: Generates two reports in parallel:
+  - `migration_report_live.html`: Real-time data from APIs
+  - `migration_report_simulated.html`: Test scenarios for validation
 

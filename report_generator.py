@@ -15,6 +15,7 @@ class MigrationDecisionReportGenerator:
         forecasted_intensities: Dict[str, Dict[int, float]],
         candidate_zones: List[str],
         simulation_results: Dict[str, Any] = None,
+        api_measurements: Dict[str, List[Dict[str, Any]]] = None,
     ) -> str:
         """
         Generate a detailed HTML report showing migration decision calculations.
@@ -118,6 +119,7 @@ class MigrationDecisionReportGenerator:
                 current_intensities=current_intensities,
                 forecasted_intensities=forecasted_intensities,
                 candidate_zones=candidate_zones,
+                api_measurements=api_measurements,
             )
 
         # Add simulation scenarios section if provided
@@ -127,6 +129,7 @@ class MigrationDecisionReportGenerator:
         html += """
         <footer>
             <p>This report shows detailed carbon intensity and migration cost calculations.</p>
+            <p>Carbon intensity data sourced from <strong>WattTime API</strong> and <strong>ElectricityMaps API</strong> with real-time hourly updates.</p>
             <p>All values are based on current API data and forecasting models.</p>
         </footer>
     </div>
@@ -227,6 +230,7 @@ class MigrationDecisionReportGenerator:
         current_intensities: Dict[str, float],
         forecasted_intensities: Dict[str, Dict[int, float]],
         candidate_zones: List[str],
+        api_measurements: Dict[str, List[Dict[str, Any]]] = None,
     ) -> str:
         source_zone = vm["current_zone"]
         source_intensity = current_intensities.get(source_zone, 0.0)
@@ -255,6 +259,7 @@ class MigrationDecisionReportGenerator:
                         <div class="zone">{source_zone} (Current)</div>
                         <div class="value">{source_intensity:.1f}</div>
                         <div class="unit">gCO2/MWh (current) | Avg: {source_avg:.1f}</div>
+                        <div class="unit">📊 Current Intensity from WattTime/ElectricityMaps API</div>
                     </div>
 """
         
@@ -277,6 +282,54 @@ class MigrationDecisionReportGenerator:
 """
         
         html += """
+                </div>
+"""
+        
+        # Add API measurements section if available
+        source_zone = vm["current_zone"]
+        if api_measurements and source_zone in api_measurements:
+            measurements = api_measurements[source_zone]
+            html += """
+                <div class="candidate-zones" style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                    <h4 style="color: #856404; margin-bottom: 15px;">🔍 API Measurements</h4>
+                    <table class="candidate-table">
+                        <thead>
+                            <tr>
+                                <th>Data Source</th>
+                                <th>CO2 Intensity (gCO2/MWh)</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+"""
+            for measurement in measurements:
+                source = measurement.get("source", "Unknown")
+                gco2 = measurement.get("gco2", 0.0)
+                is_fallback = "Fallback" in source
+                status_class = "negative" if is_fallback else "positive"
+                status_text = "⚠️ Fallback" if is_fallback else "✓ Live"
+                html += f"""
+                            <tr>
+                                <td class="zone-name">{source}</td>
+                                <td>{gco2:.1f}</td>
+                                <td><span class="sla-check {status_class}" style="padding: 5px 10px;">{status_text}</span></td>
+                            </tr>
+"""
+            html += """
+                        </tbody>
+                    </table>
+                </div>
+"""
+        
+        html += """
+                <div class="candidate-zones" style="margin-top: 30px; padding: 20px; background: #f0f7ff; border-radius: 8px; border-left: 4px solid #17a2b8;">
+                    <h4 style="color: #17a2b8; margin-bottom: 15px;">📡 Data Sources</h4>
+                    <div style="font-size: 13px; line-height: 1.8; color: #555;">
+                        <div style="margin-bottom: 10px;"><strong>WattTime API:</strong> Provides real-time carbon signal index and region-based intensity</div>
+                        <div style="margin-bottom: 10px;"><strong>ElectricityMaps API:</strong> Fallback source for carbon intensity data</div>
+                        <div style="margin-bottom: 10px;"><strong>Aggregation Method:</strong> Average of both sources for reliability</div>
+                        <div><strong>Update Frequency:</strong> Polled every 5 minutes or on-demand</div>
+                    </div>
                 </div>
 
                 <div class="candidate-zones">

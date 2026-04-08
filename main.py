@@ -142,6 +142,99 @@ def capture_simulation_results() -> Dict[str, Any]:
     return {'scenarios': scenarios}
 
 
+def generate_live_data_report(orchestrator: Orchestrator, sample_vms: List[Dict[str, Any]]) -> str:
+    """Generate report for live data from the orchestrator."""
+    print("\nGenerating live data HTML report...")
+    report_generator = MigrationDecisionReportGenerator()
+    
+    # Run migration decision cycle
+    print("Running migration decision cycle...")
+    results = orchestrator.run_cycle(sample_vms)
+    
+    # Print console output
+    print("\n--- Migration Decisions ---")
+    for item in results:
+        decision = item["decision"]
+        print(f"VM {decision.vm_id}: {decision.reason}")
+        if item["migration"]:
+            print(f"  migration: {item['migration']}")
+    
+    # Gather live data for report
+    current_intensities = orchestrator.monitor.latest
+    forecasted_intensities = {}
+    api_measurements = {}
+    for zone in orchestrator.monitor.zones:
+        history = orchestrator.monitor.get_history(zone)
+        watttime_forecast = orchestrator.monitor.get_forecast(zone, horizon_hours=orchestrator.forecaster.horizon_hours)
+        if len(history) >= orchestrator.forecaster.seq_len + orchestrator.forecaster.horizon_hours:
+            orchestrator.forecaster.train(history, epochs=10)
+        forecasted_intensities[zone] = orchestrator.forecaster.forecast(history, watttime_forecast)
+        # Gather individual API measurements for each zone
+        api_measurements[zone] = orchestrator.monitor.get_measurements(zone)
+    
+    html_report = report_generator.generate_html_report(
+        vm_inventory=sample_vms,
+        decisions=results,
+        current_intensities=current_intensities,
+        forecasted_intensities=forecasted_intensities,
+        candidate_zones=orchestrator.monitor.zones,
+        simulation_results=None,
+        api_measurements=api_measurements,
+    )
+    
+    report_file = save_report_to_file(html_report, "migration_report_live.html")
+    print(f"✓ Live data report saved to {report_file}")
+    return report_file
+
+
+def generate_simulated_data_report() -> str:
+    """Generate report for simulated test data."""
+    print("\nGenerating simulated data HTML report...")
+    report_generator = MigrationDecisionReportGenerator()
+    
+    # Capture simulation results
+    simulation_results = capture_simulation_results()
+    
+    # Create mock VMs from simulation data
+    mock_vms = [scenario['vm'] for scenario in simulation_results['scenarios']]
+    
+    # Create mock decisions from simulation data
+    mock_decisions = []
+    for scenario in simulation_results['scenarios']:
+        decision_obj = scenario['decision']
+        mock_decisions.append({
+            'decision': type('Decision', (), {
+                'vm_id': decision_obj['vm_id'],
+                'source_zone': decision_obj['source_zone'],
+                'target_zone': decision_obj['target_zone'],
+                'should_migrate': decision_obj['should_migrate'],
+                'net_carbon_saving': decision_obj['net_carbon_saving'],
+                'estimated_downtime': decision_obj['estimated_downtime'],
+                'reason': decision_obj['reason']
+            })()
+        })
+    
+    # Create mock intensity data from simulation
+    candidate_zones = list(scenario['current_intensities'].keys() for scenario in simulation_results['scenarios'])[0]
+    mock_current_intensities = simulation_results['scenarios'][0]['current_intensities']
+    mock_forecasted_intensities = {}
+    for zone in candidate_zones:
+        mock_forecasted_intensities[zone] = {1: mock_current_intensities[zone]}
+    
+    html_report = report_generator.generate_html_report(
+        vm_inventory=mock_vms,
+        decisions=mock_decisions,
+        current_intensities=mock_current_intensities,
+        forecasted_intensities=mock_forecasted_intensities,
+        candidate_zones=list(candidate_zones),
+        simulation_results=simulation_results,
+    )
+    
+    report_file = save_report_to_file(html_report, "migration_report_simulated.html")
+    print(f"✓ Simulated data report saved to {report_file}")
+    return report_file
+
+
 def main() -> None:
     # Load environment variables from .env file
     load_dotenv()
@@ -176,45 +269,11 @@ def main() -> None:
         },
     ]
 
-    print("Running migration decision cycle...")
-    results = orchestrator.run_cycle(sample_vms)
+    # Generate live data report
+    generate_live_data_report(orchestrator, sample_vms)
     
-    # Print console output
-    print("\n--- Migration Decisions ---")
-    for item in results:
-        decision = item["decision"]
-        print(f"VM {decision.vm_id}: {decision.reason}")
-        if item["migration"]:
-            print(f"  migration: {item['migration']}")
-    
-    # Generate detailed HTML report
-    print("\nGenerating detailed HTML report...")
-    report_generator = MigrationDecisionReportGenerator()
-    
-    # Gather data for report
-    current_intensities = orchestrator.monitor.latest
-    forecasted_intensities = {}
-    for zone in orchestrator.monitor.zones:
-        history = orchestrator.monitor.get_history(zone)
-        watttime_forecast = orchestrator.monitor.get_forecast(zone, horizon_hours=orchestrator.forecaster.horizon_hours)
-        if len(history) >= orchestrator.forecaster.seq_len + orchestrator.forecaster.horizon_hours:
-            orchestrator.forecaster.train(history, epochs=10)
-        forecasted_intensities[zone] = orchestrator.forecaster.forecast(history, watttime_forecast)
-    
-    # Capture simulation results
-    simulation_results = capture_simulation_results()
-    
-    html_report = report_generator.generate_html_report(
-        vm_inventory=sample_vms,
-        decisions=results,
-        current_intensities=current_intensities,
-        forecasted_intensities=forecasted_intensities,
-        candidate_zones=orchestrator.monitor.zones,
-        simulation_results=simulation_results,
-    )
-    
-    report_file = save_report_to_file(html_report, "migration_report.html")
-    print(f"✓ Report saved to {report_file}")
+    # Generate simulated data report
+    generate_simulated_data_report()
 
 
 if __name__ == "__main__":
