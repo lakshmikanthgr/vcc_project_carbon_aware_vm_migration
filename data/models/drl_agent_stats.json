@@ -1,0 +1,28 @@
+{
+  "training_steps": 100000,
+  "n_envs": 4,
+  "eval_episodes": 20,
+  "note": "zone-aware state with randomised reset",
+  "baselines": {
+    "no_migration": {
+      "migrations": 0,
+      "sla_violations": 0,
+      "net_co2_saved_g": 0.0
+    },
+    "greedy_always": {
+      "migrations": 113,
+      "sla_violations": 0,
+      "net_co2_saved_g": 98154.6
+    },
+    "calm_rule_based": {
+      "migrations": 74,
+      "sla_violations": 0,
+      "net_co2_saved_g": 17188.9
+    },
+    "calm_drl": {
+      "migrations": 38,
+      "sla_violations": 0,
+      "net_co2_saved_g": 7325.0
+    }
+  }
+}

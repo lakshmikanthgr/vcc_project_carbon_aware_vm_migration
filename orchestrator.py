@@ -1,6 +1,12 @@
 import os
 from typing import Any, Dict, List
 
+try:
+    from database import init_db, log_carbon_readings, log_migration_decision
+    _DB_AVAILABLE = True
+except ImportError:
+    _DB_AVAILABLE = False
+
 from migration_cost_estimator import MigrationCostEstimator
 from migration_engine import MigrationEngine
 from gcp_migration import GcpMigrationEngine
@@ -8,15 +14,33 @@ from services.carbon_forecaster import CarbonForecaster
 from services.carbon_service import CarbonIntensityMonitor
 from sla_classifier import SlaTierClassifier
 from decision_engine import DecisionEngine
+import os as _os
+_USE_DRL = _os.getenv("USE_DRL", "false").lower() == "true"
+if _USE_DRL:
+    try:
+        from drl_decision_engine import DRLDecisionEngine
+    except ImportError:
+        _USE_DRL = False
 
 
 class Orchestrator:
-    def __init__(self):
+    def __init__(self, persist: bool = True):
+        if persist and _DB_AVAILABLE:
+            init_db()
+        self._persist = persist and _DB_AVAILABLE
         self.monitor = CarbonIntensityMonitor()
         self.forecaster = CarbonForecaster(horizon_hours=4)
         self.sla_classifier = SlaTierClassifier()
         self.cost_estimator = MigrationCostEstimator(network_capacity_mbps=1000.0)
-        self.decision_engine = DecisionEngine(self.cost_estimator, self.sla_classifier)
+        if _USE_DRL:
+            self.decision_engine = DRLDecisionEngine(
+                cost_estimator=self.cost_estimator,
+                sla_classifier=self.sla_classifier,
+            )
+            print("[Orchestrator] Using DRL decision engine")
+        else:
+            self.decision_engine = DecisionEngine(self.cost_estimator, self.sla_classifier)
+            print("[Orchestrator] Using rule-based greedy decision engine")
         self.migration_engine = self._create_migration_engine()
 
     def _create_migration_engine(self) -> MigrationEngine:
@@ -55,7 +79,7 @@ class Orchestrator:
                   f"target_zone={decision.target_zone}, net_carbon_saving={decision.net_carbon_saving:.2f} gCO2, "
                   f"estimated_downtime={decision.estimated_downtime:.1f} seconds, reason={decision.reason}")
 
-            if not decision.should_migrate:
+            if decision.should_migrate:
                 migration_result = self.migration_engine.execute(
                     vm_id=decision.vm_id,
                     source_zone=decision.source_zone,
@@ -66,5 +90,22 @@ class Orchestrator:
                 outcomes.append({"decision": decision, "migration": migration_result})
             else:
                 outcomes.append({"decision": decision, "migration": None})
+
+            # Persist decision to SQLite
+            if self._persist:
+                metrics = self.cost_estimator.estimate(
+                    vm_size_gb=float(vm.get("size_gb", 16.0)),
+                    dirty_rate_mb_s=float(vm["runtime_metrics"].get("dirty_rate", 10.0)),
+                    intensity_gco2=current_intensities.get(vm["current_zone"], 220.0),
+                )
+                tier = self.sla_classifier.classify(vm["sla_contract"], vm["runtime_metrics"])
+                log_migration_decision(decision, tier.value, metrics["carbon_cost_gco2"])
+
+        # Persist carbon readings
+        if self._persist:
+            for zone in self.monitor.zones:
+                measurements = self.monitor.get_measurements(zone)
+                if measurements:
+                    log_carbon_readings(zone, measurements)
 
         return outcomes

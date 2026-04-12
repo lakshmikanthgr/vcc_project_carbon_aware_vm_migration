@@ -68,7 +68,11 @@ class WattTimeClient:
         self.REGION_FROM_LOC_URL = f"{self.base_url}{self.REGION_FROM_LOC_PATH}"
         self.SIGNAL_INDEX_URL = f"{self.base_url}{self.SIGNAL_INDEX_PATH}"
         if self.username and self.password and self.user_email and self.org:
-            self.token = self.authenticate()
+            try:
+                self.token = self.authenticate()
+            except Exception as e:
+                print(f"WattTime auth skipped (network unavailable): {type(e).__name__}")
+                self.token = None
 
     def authenticate(self) -> str:
         # Register if needed
@@ -211,7 +215,17 @@ class CarbonIntensityMonitor:
         return {"zone": zone, "source": source, "gco2": gco2}
 
     def aggregate_intensity(self, measurements: List[Dict[str, float]]) -> float:
-        return sum(measurement["gco2"] for measurement in measurements) / len(measurements)
+        # Only use sources reporting absolute gCO2/kWh (ElectricityMaps).
+        # WattTime signal-index returns a 0-100 relative MOER index, not gCO2/kWh,
+        # so averaging it with ElectricityMaps values produces meaningless results.
+        em_readings = [
+            m["gco2"] for m in measurements
+            if "ElectricityMaps" in m["source"] and "Fallback" not in m["source"]
+        ]
+        if em_readings:
+            return em_readings[0]
+        # Fall back to first available (WattTime or synthetic)
+        return measurements[0]["gco2"] if measurements else 0.0
 
     def poll_once(self) -> Dict[str, float]:
         current_time = time.time()

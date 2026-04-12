@@ -161,8 +161,10 @@ def generate_live_data_report(orchestrator: Orchestrator, sample_vms: List[Dict[
         if item["migration"]:
             print(f"  migration: {item['migration']}")
     
-    # Gather live data for report
+    # Gather live data for report — re-use already-polled intensities from run_cycle
     current_intensities = orchestrator.monitor.latest
+    if not any(v > 0 for v in current_intensities.values()):
+        current_intensities = orchestrator.monitor.poll_once()
     forecasted_intensities = {}
     api_measurements = {}
     for zone in orchestrator.monitor.zones:

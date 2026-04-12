@@ -21,6 +21,8 @@ class TemporalBlock(nn.Module):
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         out = self.net(x)
+        # Trim causal padding: output may be longer than input due to Conv1d padding.
+        out = out[:, :, -x.size(2):]
         res = x if self.downsample is None else self.downsample(x)
         return self.relu(out + res)
 
