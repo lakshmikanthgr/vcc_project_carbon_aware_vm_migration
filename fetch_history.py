@@ -49,7 +49,7 @@ ZONE_BASE = {
 }
 
 
-# ── Live fetch ─────────────────────────────────────────────────────────────────
+#  Live fetch ─
 
 def fetch_live(zone: str, api_key: str) -> Optional[List[Tuple[str, float]]]:
     """Fetch up to 24 hours of hourly readings from ElectricityMaps."""
@@ -75,7 +75,7 @@ def fetch_live(zone: str, api_key: str) -> Optional[List[Tuple[str, float]]]:
         return None
 
 
-# ── Synthetic fallback ─────────────────────────────────────────────────────────
+#  Synthetic fallback ─
 
 def generate_synthetic(zone: str, n_hours: int = 48) -> List[Tuple[str, float]]:
     """
@@ -95,7 +95,7 @@ def generate_synthetic(zone: str, n_hours: int = 48) -> List[Tuple[str, float]]:
     return records
 
 
-# ── Save CSV ───────────────────────────────────────────────────────────────────
+#  Save CSV ─
 
 def save_csv(zone: str, records: List[Tuple[str, float]]) -> Path:
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
@@ -107,7 +107,7 @@ def save_csv(zone: str, records: List[Tuple[str, float]]) -> Path:
     return path
 
 
-# ── Main ───────────────────────────────────────────────────────────────────────
+#  Main ─
 
 def fetch_and_save_all() -> None:
     print("=== CALM-SLA: Fetching carbon history ===\n")

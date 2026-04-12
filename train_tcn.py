@@ -39,7 +39,7 @@ HISTORY_DIR = Path(CARBON_HISTORY_DIR)
 MODEL_DIR   = Path(MODELS_DIR)
 
 
-# ── Load CSV ───────────────────────────────────────────────────────────────────
+#  Load CSV ─
 
 def load_csv(zone: str) -> List[float]:
     path = HISTORY_DIR / f"{zone}.csv"
@@ -56,7 +56,7 @@ def load_csv(zone: str) -> List[float]:
     return values
 
 
-# ── Evaluate a trained forecaster ─────────────────────────────────────────────
+#  Evaluate a trained forecaster ─
 
 def evaluate_forecaster(forecaster: CarbonForecaster, history: List[float]) -> Dict[str, float]:
     """Compute MAE on held-out last 10% of history."""
@@ -74,7 +74,7 @@ def evaluate_forecaster(forecaster: CarbonForecaster, history: List[float]) -> D
     return {"mae": round(mae, 2), "n_test": len(test_target)}
 
 
-# ── Main ───────────────────────────────────────────────────────────────────────
+#  Main ─
 
 def train_all(epochs: int = 50, eval_only: bool = False) -> None:
     MODEL_DIR.mkdir(parents=True, exist_ok=True)

@@ -38,7 +38,7 @@
     overflow-x: hidden;
   }
 
-  /* ── Grid background ── */
+  /*  Grid background  */
   body::before {
     content: '';
     position: fixed; inset: 0; z-index: 0;
@@ -50,7 +50,7 @@
     pointer-events: none;
   }
 
-  /* ── Glow orbs ── */
+  /*  Glow orbs  */
   .orb {
     position: fixed; border-radius: 50%;
     filter: blur(120px); opacity: 0.07; pointer-events: none; z-index: 0;
@@ -58,10 +58,10 @@
   .orb-1 { width: 600px; height: 600px; background: var(--green);  top: -200px; left: -150px; }
   .orb-2 { width: 400px; height: 400px; background: var(--blue);   bottom: -100px; right: -100px; }
 
-  /* ── Layout ── */
+  /*  Layout  */
   .wrapper { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 0 24px 48px; }
 
-  /* ── Header ── */
+  /*  Header  */
   header {
     display: flex; align-items: center; justify-content: space-between;
     padding: 28px 0 24px;
@@ -88,7 +88,7 @@
   @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
   .refresh-info { font-size: 11px; color: var(--muted); font-family: var(--mono); }
 
-  /* ── Section titles ── */
+  /*  Section titles  */
   .section-label {
     font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
     text-transform: uppercase; color: var(--muted);
@@ -96,7 +96,7 @@
   }
   .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 
-  /* ── Stat cards row ── */
+  /*  Stat cards row  */
   .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
   .stat-card {
     background: var(--card); border: 1px solid var(--border);
@@ -116,11 +116,11 @@
   .stat-delta.up   { color: var(--green); }
   .stat-delta.warn { color: var(--amber); }
 
-  /* ── Main grid ── */
+  /*  Main grid  */
   .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
   .full-width { grid-column: 1 / -1; }
 
-  /* ── Cards ── */
+  /*  Cards  */
   .card {
     background: var(--card); border: 1px solid var(--border);
     border-radius: 12px; padding: 22px 24px;
@@ -128,7 +128,7 @@
   .card-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
   .card-title .icon { font-size: 15px; }
 
-  /* ── Zone carbon cards ── */
+  /*  Zone carbon cards  */
   .zone-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
   .zone-card {
     background: var(--surface); border: 1px solid var(--border);
@@ -143,11 +143,11 @@
   .zone-source { font-size: 10px; color: var(--muted); margin-top: 8px; font-family: var(--mono); }
   .zone-status { position: absolute; top: 12px; right: 12px; width: 7px; height: 7px; border-radius: 50%; }
 
-  /* ── Carbon sparkline ── */
+  /*  Carbon sparkline  */
   .sparkline-wrap { overflow: hidden; }
   canvas.sparkline { width: 100%; height: 80px; display: block; }
 
-  /* ── Baseline comparison ── */
+  /*  Baseline comparison  */
   .baseline-table { width: 100%; border-collapse: collapse; }
   .baseline-table th {
     font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
@@ -176,7 +176,7 @@
   .negative { color: var(--red); }
   .neutral  { color: var(--muted); }
 
-  /* ── VM fleet table ── */
+  /*  VM fleet table  */
   .vm-table { width: 100%; border-collapse: collapse; }
   .vm-table th {
     font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em;
@@ -194,7 +194,7 @@
   .tier-silver { background: rgba(61,155,255,.1);  color: var(--blue);  border: 1px solid rgba(61,155,255,.3); }
   .tier-bronze { background: rgba(0,196,204,.1);   color: var(--teal);  border: 1px solid rgba(0,196,204,.3); }
 
-  /* ── Migration log ── */
+  /*  Migration log  */
   .log-list { display: flex; flex-direction: column; gap: 8px; }
   .log-item {
     display: flex; align-items: flex-start; gap: 12px;
@@ -213,11 +213,11 @@
   .log-saving { font-family: var(--mono); font-size: 12px; color: var(--green); white-space: nowrap; padding-top: 2px; }
   .log-time { font-family: var(--mono); font-size: 10px; color: var(--muted); white-space: nowrap; }
 
-  /* ── Trend chart ── */
+  /*  Trend chart  */
   .trend-wrap { position: relative; }
   canvas#trendChart { width: 100%; height: 180px; }
 
-  /* ── Footer ── */
+  /*  Footer  */
   footer {
     margin-top: 40px; padding-top: 20px;
     border-top: 1px solid var(--border);
@@ -225,7 +225,7 @@
     font-size: 11px; color: var(--muted); font-family: var(--mono);
   }
 
-  /* ── Loading overlay ── */
+  /*  Loading overlay  */
   .loading {
     display: none; position: fixed; inset: 0; z-index: 100;
     background: rgba(8,12,16,.7); backdrop-filter: blur(4px);
@@ -234,7 +234,7 @@
   }
   .loading.visible { display: flex; }
 
-  /* ── Error banner ── */
+  /*  Error banner  */
   .error-banner {
     display: none; background: rgba(255,77,106,.08); border: 1px solid rgba(255,77,106,.3);
     border-radius: 8px; padding: 10px 16px; margin-bottom: 16px;
@@ -372,7 +372,7 @@
 const API = 'http://localhost:8199';
 const REFRESH_MS = 15_000;
 
-// ── Colour helpers ──────────────────────────────────────────────────────────
+//  Colour helpers 
 function carbonColour(gco2) {
   if (gco2 < 100) return 'var(--green)';
   if (gco2 < 250) return 'var(--teal)';
@@ -387,7 +387,7 @@ function timeAgo(ts) {
 }
 function fmt(n, dp=1) { return typeof n === 'number' ? n.toFixed(dp) : '—'; }
 
-// ── Trend chart (pure Canvas) ───────────────────────────────────────────────
+//  Trend chart (pure Canvas) ─
 const trendHistory = { 'SE': [], 'DE': [], 'DK-DK1': [] };
 const ZONE_COLORS  = { 'SE': '#00e8a2', 'DE': '#f5a623', 'DK-DK1': '#3d9bff' };
 let trendCanvas, trendCtx;
@@ -461,7 +461,7 @@ function drawTrend() {
   }
 }
 
-// ── Render zones ────────────────────────────────────────────────────────────
+//  Render zones 
 function renderZones(data) {
   const grid = document.getElementById('zone-grid');
   const zones = data.zones || {};
@@ -498,7 +498,7 @@ function renderZones(data) {
   drawTrend();
 }
 
-// ── Render summary stats ────────────────────────────────────────────────────
+//  Render summary stats 
 function renderSummary(s, status) {
   document.getElementById('stat-saved').innerHTML    = `${fmt(s.total_carbon_saved_gco2,1)}<span>gCO₂</span>`;
   document.getElementById('stat-migs').textContent   = s.total_migrations;
@@ -516,7 +516,7 @@ function renderSummary(s, status) {
   }
 }
 
-// ── Render baseline table ────────────────────────────────────────────────────
+//  Render baseline table 
 function renderBaseline(b) {
   const rows = [
     { name:'No Migration',      badge:null,       data: b.no_migration,  key:'no' },
@@ -556,7 +556,7 @@ function renderBaseline(b) {
   }).join('');
 }
 
-// ── Render migration log ─────────────────────────────────────────────────────
+//  Render migration log ─
 function renderLog(decisions) {
   if (!decisions || !decisions.length) {
     document.getElementById('log-list').innerHTML = '<div style="color:var(--muted);font-size:12px">No decisions recorded yet — run a cycle first.</div>';
@@ -584,7 +584,7 @@ function renderLog(decisions) {
   }).join('');
 }
 
-// ── Render VM fleet ──────────────────────────────────────────────────────────
+//  Render VM fleet 
 function renderVMs(vms) {
   if (!vms || !vms.length) return;
   const tierClass = { Gold:'tier-gold', Silver:'tier-silver', Bronze:'tier-bronze' };
@@ -604,7 +604,7 @@ function renderVMs(vms) {
   }).join('');
 }
 
-// ── Fetch and update ─────────────────────────────────────────────────────────
+//  Fetch and update ─
 async function fetchJSON(path) {
   const r = await fetch(API + path);
   if (!r.ok) throw new Error(`${path} → HTTP ${r.status}`);
@@ -642,7 +642,7 @@ async function refresh() {
   }
 }
 
-// ── Boot ─────────────────────────────────────────────────────────────────────
+//  Boot ─
 document.getElementById('loader').classList.add('visible');
 window.addEventListener('load', () => {
   initTrend();

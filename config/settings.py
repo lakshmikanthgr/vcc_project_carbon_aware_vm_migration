@@ -9,14 +9,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# ── API credentials ──────────────────────────────────────────────────────────
+#  API credentials 
 ELECTRICITYMAPS_API_KEY = os.getenv("ELECTRICITYMAPS_API_KEY")
 WATTTIME_USERNAME       = os.getenv("WATTTIME_USERNAME")
 WATTTIME_PASSWORD       = os.getenv("WATTTIME_PASSWORD")
 WATTTIME_USER_EMAIL     = os.getenv("WATTTIME_USER_EMAIL")
 WATTTIME_ORG            = os.getenv("ORG") or os.getenv("WATTTIME_ORG")
 
-# ── Data center configuration ────────────────────────────────────────────────
+#  Data center configuration 
 # Maps logical DC names to ElectricityMaps zone strings and coordinates.
 # Zone availability: https://app.electricitymaps.com
 DATA_CENTERS = {
@@ -26,12 +26,12 @@ DATA_CENTERS = {
     "US-AK":   {"zone": "US-AK",  "name": "Alaska",         "lat": 64.2008, "lon": -152.2782},
 }
 
-# ── Timing ───────────────────────────────────────────────────────────────────
+#  Timing ─
 POLL_INTERVAL_SECONDS     = int(os.getenv("POLL_INTERVAL", "300"))   # carbon API poll frequency
 DECISION_INTERVAL_SECONDS = int(os.getenv("POLL_INTERVAL", "300"))   # orchestrator cycle frequency
 FORECAST_HORIZON_HOURS    = 4                                          # TCN prediction window
 
-# ── DRL reward weights ────────────────────────────────────────────────────────
+#  DRL reward weights 
 # These mirror the deployment guide spec exactly.
 ALPHA = 1.0   # weight on carbon savings (positive reward)
 BETA  = 0.3   # weight on migration overhead (negative reward)
@@ -41,25 +41,25 @@ GAMMA = {     # SLA violation penalty per tier
     "Bronze":  0.5,   # Flexible  — migrate freely
 }
 
-# ── SLA downtime limits (seconds) ────────────────────────────────────────────
+#  SLA downtime limits (seconds) 
 SLA_DOWNTIME_LIMITS = {
     "Gold":   60.0,    # Critical workloads  ≤ 60 s
     "Silver": 180.0,   # Standard workloads  ≤ 180 s
     "Bronze": 900.0,   # Flexible workloads  ≤ 900 s (no strict limit)
 }
 
-# ── Network / cost model ─────────────────────────────────────────────────────
+#  Network / cost model ─
 NETWORK_CAPACITY_MBPS = 1000.0   # WAN link capacity for migration traffic
 ENERGY_PER_GB_KWH     = 0.25     # kWh consumed per GB transferred
 
-# ── TCN forecaster ────────────────────────────────────────────────────────────
+#  TCN forecaster 
 TCN_SEQ_LEN      = 12    # input sequence length (steps)
 TCN_HORIZON_HRS  = FORECAST_HORIZON_HOURS
 TCN_NUM_CHANNELS = [16, 32]
 TCN_KERNEL_SIZE  = 3
 TCN_DROPOUT      = 0.1
 
-# ── DRL training ─────────────────────────────────────────────────────────────
+#  DRL training ─
 DRL_TOTAL_STEPS        = 500_000
 DRL_LEARNING_RATE      = 3e-4
 DRL_BUFFER_SIZE        = 100_000
@@ -70,7 +70,7 @@ DRL_EXPLORATION_EPS    = 0.02
 DRL_N_ENVS             = 4
 DRL_MODEL_PATH         = "data/models/drl_agent"
 
-# ── Paths ─────────────────────────────────────────────────────────────────────
+#  Paths ─
 DB_PATH             = "data/calm_sla.db"
 CARBON_HISTORY_DIR  = "data/carbon_history"
 MODELS_DIR          = "data/models"

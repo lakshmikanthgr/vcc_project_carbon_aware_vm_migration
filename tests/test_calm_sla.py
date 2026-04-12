@@ -24,7 +24,7 @@ from unittest.mock import patch
 import numpy as np
 import pytest
 
-# ── Ensure project root is on path ────────────────────────────────────────────
+#  Ensure project root is on path 
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 

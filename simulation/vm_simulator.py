@@ -50,7 +50,7 @@ class SimulatedVM:
     sla_violations:  int = 0
     is_migrating:    bool = False
 
-    # ── Derived horizon ───────────────────────────────────────────────────────
+    #  Derived horizon ─
     @property
     def forecast_horizon_hours(self) -> float:
         return {"Gold": 2.0, "Silver": 3.0, "Bronze": 4.0}[self.tier]
@@ -59,7 +59,7 @@ class SimulatedVM:
     def max_downtime_s(self) -> float:
         return SLA_DOWNTIME_LIMITS[self.tier]
 
-    # ── Dict conversion for existing engine interfaces ────────────────────────
+    #  Dict conversion for existing engine interfaces 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to the dict format expected by DecisionEngine.evaluate()."""
         return {
@@ -79,7 +79,7 @@ class SimulatedVM:
             },
         }
 
-    # ── Metric drift ──────────────────────────────────────────────────────────
+    #  Metric drift 
     def update_metrics(self) -> None:
         """Drift CPU, dirty rate, and headroom slightly to simulate live load."""
         self.cpu_utilization = float(
@@ -93,7 +93,7 @@ class SimulatedVM:
         )
 
 
-# ── Factory ───────────────────────────────────────────────────────────────────
+#  Factory ─
 
 def create_vm_fleet() -> List[SimulatedVM]:
     """
@@ -150,5 +150,5 @@ def create_vm_fleet() -> List[SimulatedVM]:
     return fleet
 
 
-# ── Singleton fleet (shared across orchestrator, API, dashboard) ──────────────
+#  Singleton fleet (shared across orchestrator, API, dashboard) 
 vm_fleet: List[SimulatedVM] = create_vm_fleet()
